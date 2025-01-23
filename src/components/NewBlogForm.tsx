@@ -1,37 +1,15 @@
 import React, { useState } from 'react';
-import { supabase } from '../lib/supabase';
+import { usePostBlog } from '../utils/react-query/post-blog';
 
 export function NewBlogForm() {
   const [title, setTitle] = useState('');
   const [content, setContent] = useState('');
-  const [error, setError] = useState('');
+  const { mutate: postBlog, error } = usePostBlog();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setError('');
 
-    const user = (await supabase.auth.getUser()).data.user;
-    if (!user) {
-      setError('You must be logged in to create a blog post');
-      return;
-    }
-
-    const { error: insertError } = await supabase.from('blogs').insert([
-      {
-        title,
-        content,
-        user_id: user.id,
-        author_email: user.email,
-      },
-    ]);
-
-    if (insertError) {
-      setError(insertError.message);
-      return;
-    }
-
-    setTitle('');
-    setContent('');
+    postBlog({ title, content });
   };
 
   return (
@@ -57,7 +35,7 @@ export function NewBlogForm() {
           required
         />
       </div>
-      {error && <p className="text-red-500 text-sm">{error}</p>}
+      {error && <p className="text-red-500 text-sm">{error.message}</p>}
       <button
         type="submit"
         className="bg-indigo-600 text-white py-2 px-4 rounded-md hover:bg-indigo-700"

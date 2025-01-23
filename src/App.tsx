@@ -4,6 +4,10 @@ import { supabase } from './lib/supabase';
 import { AuthForm } from './components/AuthForm';
 import { BlogList } from './components/BlogList';
 import { NewBlogForm } from './components/NewBlogForm';
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+import { Book } from 'lucide-react';
+
+const queryClient = new QueryClient();
 
 function App() {
   const [user, setUser] = useState(null);
@@ -23,43 +27,48 @@ function App() {
   }, []);
 
   return (
-    <Router>
-      <div className="min-h-screen bg-gray-100">
-        <nav className="bg-white shadow-md">
-          <div className="max-w-7xl mx-auto px-4 py-4">
-            <div className="flex justify-between items-center">
-              <Link to="/" className="text-xl font-bold text-indigo-600">Blog Site</Link>
-              <div className="space-x-4">
-                {user ? (
-                  <>
-                    <Link to="/new" className="text-gray-600 hover:text-gray-900">New Post</Link>
-                    <button
-                      onClick={() => supabase.auth.signOut()}
-                      className="text-gray-600 hover:text-gray-900"
-                    >
-                      Logout
-                    </button>
-                  </>
-                ) : (
-                  <Link to="/auth" className="text-gray-600 hover:text-gray-900">Login</Link>
-                )}
+    <QueryClientProvider client={queryClient}>
+      <Router basename='/rell-blog/'>
+        <div className="min-h-screen bg-gray-100">
+          <nav className="bg-white shadow-md">
+            <div className="max-w-7xl mx-auto px-4 py-4">
+              <div className="flex justify-between items-center">
+                <Link to="/" className="text-xl font-bold text-indigo-600">
+                  <Book size={24} className="inline-block mr-2" />
+                  rell's blog
+                </Link>
+                <div className="space-x-4">
+                  {user ? (
+                    <>
+                      <Link to="/new" className="text-gray-600 hover:text-gray-900">New Post</Link>
+                      <button
+                        onClick={() => supabase.auth.signOut()}
+                        className="text-gray-600 hover:text-gray-900"
+                      >
+                        Logout
+                      </button>
+                    </>
+                  ) : (
+                    <Link to="/auth" className="text-gray-600 hover:text-gray-900">Login</Link>
+                  )}
+                </div>
               </div>
             </div>
-          </div>
-        </nav>
+          </nav>
 
-        <main className="max-w-4xl mx-auto px-4 py-8">
-          <Routes>
-            <Route path="/" element={<BlogList />} />
-            <Route path="/auth" element={<AuthForm />} />
-            <Route
-              path="/new"
-              element={user ? <NewBlogForm /> : <AuthForm />}
-            />
-          </Routes>
-        </main>
-      </div>
-    </Router>
+          <main className="max-w-4xl mx-auto px-4 py-8">
+            <Routes>
+              <Route path="/" element={<BlogList />} />
+              <Route path="/auth" element={<AuthForm />} />
+              <Route
+                path="/new"
+                element={user ? <NewBlogForm /> : <AuthForm />}
+              />
+            </Routes>
+          </main>
+        </div>
+      </Router>
+    </QueryClientProvider>
   );
 }
 

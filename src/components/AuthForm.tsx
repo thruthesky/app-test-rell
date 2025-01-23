@@ -1,33 +1,16 @@
 import React, { useState } from 'react';
-import { supabase } from '../lib/supabase';
+import { useAuth } from '../utils/react-query/auth';
 
 export function AuthForm() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [isLogin, setIsLogin] = useState(true);
-  const [error, setError] = useState('');
+  const { mutate: doAuth, error } = useAuth();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setError('');
 
-    try {
-      if (isLogin) {
-        const { error } = await supabase.auth.signInWithPassword({
-          email,
-          password,
-        });
-        if (error) throw error;
-      } else {
-        const { error } = await supabase.auth.signUp({
-          email,
-          password,
-        });
-        if (error) throw error;
-      }
-    } catch (err: any) {
-      setError(err.message);
-    }
+    doAuth({ isLogin, email, password });
   };
 
   return (
@@ -54,7 +37,7 @@ export function AuthForm() {
             required
           />
         </div>
-        {error && <p className="text-red-500 text-sm">{error}</p>}
+        {error && <p className="text-red-500 text-sm">{error.message}</p>}
         <button
           type="submit"
           className="w-full bg-indigo-600 text-white py-2 px-4 rounded-md hover:bg-indigo-700"
