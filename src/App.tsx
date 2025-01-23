@@ -6,6 +6,8 @@ import { BlogList } from './components/BlogList';
 import { NewBlogForm } from './components/NewBlogForm';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { Book } from 'lucide-react';
+import { UserMenu } from './components/UserMenu';
+import { BlogDetail } from './components/BlogDetail';
 
 const queryClient = new QueryClient();
 
@@ -39,17 +41,14 @@ function App() {
                 </Link>
                 <div className="space-x-4">
                   {user ? (
-                    <>
-                      <Link to="/new" className="text-gray-600 hover:text-gray-900">New Post</Link>
-                      <button
-                        onClick={() => supabase.auth.signOut()}
-                        className="text-gray-600 hover:text-gray-900"
-                      >
-                        Logout
-                      </button>
-                    </>
+                    <UserMenu user={user} />
                   ) : (
-                    <Link to="/auth" className="text-gray-600 hover:text-gray-900">Login</Link>
+                    <Link
+                      to="/auth"
+                      className="text-gray-600 hover:text-gray-900 flex items-center space-x-2"
+                    >
+                      <span className='ring-1 ring-black bg-black text-white px-1.5 py-1 rounded-md'>Login</span>
+                    </Link>
                   )}
                 </div>
               </div>
@@ -59,6 +58,7 @@ function App() {
           <main className="max-w-4xl mx-auto px-4 py-8">
             <Routes>
               <Route path="/" element={<BlogList />} />
+              <Route path="/blog/:id" element={<BlogDetail />} />
               <Route path="/auth" element={<AuthForm />} />
               <Route
                 path="/new"
